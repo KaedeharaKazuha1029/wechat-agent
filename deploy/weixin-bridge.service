@@ -1,0 +1,33 @@
+[Unit]
+Description=Weixin Agent Bridge
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=weixin-bridge
+Group=weixin-bridge
+WorkingDirectory=/opt/weixin-bridge
+Environment=WEIXIN_BRIDGE_PORT=17875
+Environment=WEIXIN_BRIDGE_CLOUD_ENABLED=0
+Environment=WEIXIN_BRIDGE_DATA=/var/lib/weixin-bridge
+EnvironmentFile=-/etc/weixin-bridge/bridge.env
+StateDirectory=weixin-bridge
+StateDirectoryMode=0700
+ExecStart=/usr/bin/env node src/main.mjs
+Restart=on-failure
+RestartSec=3s
+TimeoutStopSec=20s
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

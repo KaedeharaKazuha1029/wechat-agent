@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wechat-agent-chat",
+  "version": "0.1.0",
+  "description": "Use the WeChat inbox from ChatGPT Chat and subscribe to WeChat task events in Work."
+}

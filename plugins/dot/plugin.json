@@ -1,0 +1,6 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "wechat-agent-dot",
+  "version": "0.1.0",
+  "description": "Receive WeChat task events and reply from a personal ChatGPT Dot."
+}

@@ -1,0 +1,10 @@
+{
+  "name": "local-weixin-bridge",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": { "node": ">=24" },
+  "license": "MIT",
+  "scripts": { "start": "node src/main.mjs", "demo": "node src/main.mjs --demo", "test": "node --test", "plugin:configure": "node tools/render-plugins.mjs" },
+  "optionalDependencies": { "qrcode": "1.5.4" }
+}

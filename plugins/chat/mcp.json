@@ -1,0 +1,10 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/mcp.schema.json",
+  "mcpServers": {
+    "wechat-chat": {
+      "type": "streamable-http",
+      "url": "https://bridge.example.com/mcp/chat",
+      "extensions": { "com.openai": { "auth": { "type": "oauth", "client": { "mode": "cimd" } } } }
+    }
+  }
+}

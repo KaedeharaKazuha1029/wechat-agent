@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="bridge-token" content="__CSRF__">
+  <title>微信桥接</title>
+  <link rel="stylesheet" href="__ADMIN_BASE__/style.css">
+  <script defer src="__ADMIN_BASE__/app.js"></script>
+</head>
+<body>
+  <main>
+    <header><h1>微信桥接</h1><p id="connection" role="status">正在连接管理服务…</p>
+      <form id="admin-logout" method="post" action="__ADMIN_BASE__/logout" hidden><button type="submit" class="secondary">退出管理后台</button></form>
+    </header>
+    <p id="feedback" role="status" hidden></p>
+    <section id="dot-pair" hidden>
+      <h2>MCP 一次性配对码</h2>
+      <p><code id="dot-code"></code></p>
+      <p>请在 ChatGPT 打开的「微信桥接授权」页输入。配对码使用后失效，最多有效 10 分钟。</p>
+      <div class="inline"><button id="copy-code" type="button">复制配对码</button><button id="hide-code" type="button" class="secondary">隐藏</button></div>
+    </section>
+    <div class="layout">
+      <section id="routing">
+        <h2>默认 Agent</h2>
+        <form id="route-form" class="inline">
+          <select id="route" aria-label="默认 Agent"></select>
+          <button type="submit">切换</button>
+        </form>
+        <p>微信快捷切换 <code>/dot</code> <code>/chat</code> <code>/cc</code> <code>/codex</code> <code>/dsh</code> <code id="cloud-hint" hidden>/cloud</code>。<code>/to 别名 消息</code> 仅指定这条。</p>
+      </section>
+      <section id="public-admin-settings" hidden>
+        <h2>远程管理</h2>
+        <p id="public-admin-status"></p>
+        <form id="public-password-form" class="fields">
+          <label>新管理密码（至少 16 个字符） <input id="public-password" type="password" autocomplete="new-password" required minlength="16" maxlength="128"></label>
+          <button>保存密码并退出已有远程会话</button>
+        </form>
+      </section>
+      <section id="cloud-panel" hidden>
+        <h2>Codex 云会话</h2>
+        <form id="cloud-select-form" class="inline">
+          <select id="cloud-session" aria-label="云会话短号"></select><button>切换</button>
+        </form>
+        <form id="cloud-new-form" class="fields">
+          <label>云目标 <select id="cloud-target" aria-label="云目标"></select></label>
+          <label>会话名称 <input id="cloud-title" maxlength="40" placeholder="例如 网站维护"></label>
+          <button>新建云会话</button>
+        </form>
+        <p>微信可发 <code>/cloud list</code>、<code>/cloud new 名称</code> 或 <code>/cloud c1</code>。</p>
+        <details id="api-key-settings">
+          <summary id="key-status">OpenAI API 密钥</summary>
+          <form id="cloud-key-form" class="fields">
+            <label>托管云会话密钥 <input id="cloud-key" type="password" autocomplete="off" required></label>
+            <button>保存到桥接服务器</button>
+          </form>
+        </details>
+      </section>
+      <section id="binding">
+        <h2>微信绑定</h2>
+        <div class="inline"><button id="bind" type="button">生成绑定码</button><button id="cancel-bind" type="button" hidden>取消</button></div>
+        <p id="bind-status" role="status"></p>
+        <img id="qr" alt="微信扫码绑定二维码" width="256" height="256" hidden>
+        <form id="pin-form" class="inline" hidden>
+          <label>手机 PIN <input id="pin" inputmode="numeric" autocomplete="off" maxlength="8" required></label>
+          <button>提交</button>
+        </form>
+      </section>
+      <section id="targets-section">
+        <h2>Agent 目标</h2>
+        <ul id="targets" class="entries"></ul>
+        <details id="target-editor">
+          <summary>登记 Agent</summary>
+          <form id="target-form" class="fields">
+            <label>别名 <input name="alias" required maxlength="31" pattern="[a-z][a-z0-9\-]{0,30}" placeholder="例如 local-web"></label>
+            <label>平台 <select name="kind" id="kind">
+              <option value="codex-local">Codex Local</option>
+              <option value="codex-cloud" disabled hidden>Codex Cloud</option>
+              <option value="claude">Claude Code</option>
+              <option value="deepseek">DeepSeek Harness</option>
+              <option value="dot">ChatGPT Dot</option>
+              <option value="chat">ChatGPT Chat</option>
+              <option value="work">网页 Work（复用 Chat 插件）</option>
+            </select></label>
+            <label id="cwd-row">工作目录 <input name="cwd" placeholder="执行主机上的项目绝对路径"></label>
+            <label id="runtime-row" hidden>运行位置 <select name="runtime"><option value="auto">沿用默认</option><option value="server">ECS 本机 CLI</option><option value="windows">Windows Runner</option></select></label>
+            <label id="chat-alias-row" hidden>关联 Chat 插件别名 <input name="chatAlias" placeholder="chat"></label>
+            <label id="cloud-mode-row" hidden>云运行方式 <select name="cloudMode" id="cloud-mode"><option value="hosted">托管 Codex API（可续聊）</option><option value="native">Codex Cloud 网页任务（每次新任务）</option></select></label>
+            <label id="env-row" hidden>Codex 云环境 ID <input name="environment"></label>
+            <label id="model-row" hidden>模型（可选） <input name="model" placeholder="gpt-6-astra"></label>
+            <label id="session-row">已有会话 ID（可选）<input name="sessionId"></label>
+            <label id="write-row" class="check"><input name="write" type="checkbox">允许 Codex 修改工作区</label>
+            <button>保存 Agent</button>
+          </form>
+        </details>
+      </section>
+      <section id="demo" hidden>
+        <h2>模拟微信</h2>
+        <form id="demo-form" class="fields">
+          <textarea id="demo-text" aria-label="模拟微信消息" placeholder="/to slow 测试切换" required></textarea>
+          <button>模拟发送</button>
+        </form>
+        <ul id="demo-replies" class="entries" aria-label="模拟微信回复"></ul>
+      </section>
+    </div>
+    <section id="task-section"><h2>最近任务</h2><div id="jobs" class="jobs"></div></section>
+  </main>
+</body>
+</html>

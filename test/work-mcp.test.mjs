@@ -1,0 +1,42 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { Store } from '../src/core.mjs';
+import { Dot } from '../src/dot.mjs';
+
+test('Work uses the Chat connection without sharing its manual queue or the Dot subscription', async t => {
+  const store = new Store(':memory:', { cloudEnabled: false });
+  t.after(() => store.db.close());
+  store.set('account', { id: 'bot', owner: 'owner' });
+  for (const target of [{ alias: 'cloud', kind: 'work', chatAlias: 'chat' }, { alias: 'chat', kind: 'chat' }, { alias: 'dot', kind: 'dot' }]) store.putTarget(target);
+  const original = { expires: Date.now() + 50000, url: 'https://dot.example', id: 'dot-existing' };
+  store.run('INSERT INTO subscriptions VALUES (?,?)', 'dot', JSON.stringify(original));
+  const delivered = [];
+  const bridge = new Dot(store, 'test-key', { deliver: async (_subscription, _id, event) => {
+    if (event.type === 'verification') return JSON.stringify({ challenge: event.challenge });
+    delivered.push(event.data.job_id);
+    return '{}';
+  } });
+  const signal = AbortSignal.timeout(3000);
+  const rpc = (alias, method, params) => bridge.rpc(alias, { method, params }, signal);
+  const name = 'weixin.message.received';
+  assert.equal((await rpc('chat', 'events/list')).events[0].name, name);
+  assert.equal((await rpc('cloud', 'events/list')).events.length, 0);
+  assert.deepEqual((await rpc('chat', 'tools/list')).tools.map(item => item.name), ['list_pending', 'get_message', 'reply']);
+  await rpc('chat', 'events/subscribe', { name, delivery: { mode: 'webhook', url: 'https://chatgpt.com/work-event', secret: 'whsec_' + Buffer.alloc(32).toString('base64') } });
+  assert.equal(bridge.subscription('cloud').url, 'https://chatgpt.com/work-event');
+  assert.deepEqual(bridge.subscription('dot'), original);
+  store.handleMessage('bot', 'owner', '/chat 手动消息', () => null);
+  store.handleMessage('bot', 'owner', '/cloud 网页 Work 消息', () => null);
+  assert.equal(store.route('bot', 'owner'), 'cloud');
+  const job = store.one("SELECT * FROM jobs WHERE alias='cloud'");
+  const dispatch = bridge.dispatch(JSON.parse(job.target), job, signal);
+  const manual = await rpc('chat', 'tools/call', { name: 'list_pending', arguments: {} });
+  assert.deepEqual(manual.structuredContent.jobs.map(item => item.preview), ['手动消息']);
+  const args = { job_id: job.id };
+  const read = await rpc('chat', 'tools/call', { name: 'get_message', arguments: args });
+  assert.equal(read.content[0].text, '网页 Work 消息');
+  assert.equal((await rpc('dot', 'tools/call', { name: 'get_message', arguments: args })).isError, true);
+  await rpc('chat', 'tools/call', { name: 'reply', arguments: { ...args, text: '来自网页 Work' } });
+  assert.equal(await dispatch, '来自网页 Work');
+  assert.deepEqual(delivered, [job.id]);
+});

@@ -1,0 +1,14 @@
+{
+  "workspaceRoot": "C:/Projects/example-repo",
+  "tokenFile": ".local/runner.token",
+  "runtimeDirectory": ".runtime/runner",
+  "sshHost": "wechat-bridge-server",
+  "sshConfig": "",
+  "runnerPort": 17867,
+  "remoteRunnerPort": 17867,
+  "adminPort": 17875,
+  "preferMxc": true,
+  "dotEgressPort": 17868,
+  "dotEgressUpstream": "http://127.0.0.1:8080",
+  "dotEgressSocket": "/run/weixin-dot-egress/http.sock"
+}

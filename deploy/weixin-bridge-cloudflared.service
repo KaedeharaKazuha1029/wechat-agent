@@ -1,0 +1,30 @@
+[Unit]
+Description=Cloudflare connector for the Weixin Bridge Dot endpoint
+After=network-online.target weixin-bridge.service
+Wants=network-online.target weixin-bridge.service
+
+[Service]
+Type=simple
+User=weixin-bridge
+Group=weixin-bridge
+StateDirectory=weixin-bridge-cloudflared
+StateDirectoryMode=0700
+Environment=HOME=/var/lib/weixin-bridge-cloudflared
+LoadCredential=tunnel.token:/etc/weixin-bridge/cloudflare.token
+ExecStart=/opt/weixin-bridge/bin/cloudflared tunnel --no-autoupdate --metrics 127.0.0.1:20268 --protocol http2 run --token-file /run/credentials/weixin-bridge-cloudflared.service/tunnel.token
+Restart=on-failure
+RestartSec=5s
+TimeoutStopSec=20s
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

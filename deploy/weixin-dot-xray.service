@@ -1,0 +1,29 @@
+[Unit]
+Description=Dedicated Xray egress for Weixin Bridge Dot callbacks
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=weixin-dot-xray
+Group=weixin-dot-egress
+RuntimeDirectory=weixin-dot-xray
+RuntimeDirectoryMode=0750
+LoadCredential=xray.json:/etc/weixin-bridge/dot-xray.json
+ExecStart=/opt/weixin-bridge/bin/weixin-dot-xray run -config /run/credentials/weixin-dot-xray.service/xray.json
+Restart=on-failure
+RestartSec=4s
+UMask=0007
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectControlGroups=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,37 @@
+:root { color-scheme: light; font: 15px/1.55 system-ui, "Microsoft YaHei", sans-serif; color: #162623; background: #f2f6f4; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+main { margin: 0 auto; padding: 2rem 1.2rem 4rem; max-width: 1000px; }
+header { padding: .6rem .15rem 1.2rem; }
+h1 { margin: 0 0 .25rem; font-size: 2rem; letter-spacing: -.04em; }
+h2 { margin: 0 0 1rem; font-size: 1.16rem; }
+p { margin: .7rem 0 0; color: #45615a; }
+.layout { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1rem; align-items: start; }
+section { background: #fff; border: 1px solid #d4e2db; border-radius: .8rem; padding: 1rem 1.15rem; }
+#task-section { margin-top: 1rem; }
+#dot-pair { margin-bottom: 1rem; }
+#feedback { margin: 0 0 .9rem; background: #e1f2e9; border-radius: .4rem; padding: .55rem .8rem; color: #174634; }
+#feedback.error { background: #fff1eb; color: #842d16; }
+.inline { display: flex; flex-wrap: wrap; gap: .5rem; align-items: end; }
+.fields { display: grid; gap: .6rem; margin-top: .6rem; }
+label { display: grid; gap: .2rem; }
+.check { display: flex; align-items: center; }
+input, select, textarea, button { font: inherit; }
+input:not([type=checkbox]), select, textarea { width: 100%; padding: .42rem .52rem; border: 1px solid #93aaa1; border-radius: .4rem; background: #fff; color: #152621; }
+#route { flex: 1 1 9rem; }
+#pin { width: 8rem; }
+textarea { min-height: 4.5rem; resize: vertical; }
+button { border: 1px solid transparent; border-radius: .4rem; padding: .42rem .8rem; background: #176249; color: #fff; cursor: pointer; width: fit-content; }
+button:hover:not(:disabled) { background: #124b38; }
+button:disabled { opacity: .5; cursor: default; }
+button.secondary { background: #e3f1eb; color: #104634; }
+button.secondary:hover:not(:disabled) { background: #cce6d8; }
+summary { cursor: pointer; }
+.entries { padding: 0; margin: 0 0 .8rem; list-style: none; }
+.entries li, .jobs details { border-top: 1px solid #e0ebe5; padding: .55rem 0; overflow-wrap: anywhere; }
+.entries button { margin: .35rem .3rem 0 0; font-size: .88rem; }
+pre { font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; margin: .55rem 0; }
+code { padding: .05em .3em; border-radius: .25em; background: #edf3ef; }
+#qr { display: block; max-width: 100%; height: auto; }
+[hidden] { display: none !important; }
+@media (max-width: 630px) { .layout { grid-template-columns: 1fr; } }
